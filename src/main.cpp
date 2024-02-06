@@ -52,7 +52,7 @@ void setup()
   // Lちか
   pinMode(2, OUTPUT);
   initBLE();
-  iniCAM();
+  initCAM();
 
   // Serial.setDebugOutput(true);
   // Serial.println();
@@ -63,9 +63,35 @@ void setup()
   Serial.println("done");
 }
 
+/*
+explain:
+モーターの周波数を設定する関数
+usage:
+  motor: motor pin 0-3 順に[12,14,26,27]
+  frequency: 周波数 0-255
+  useAutoConversion (optional): モーターの位置を考慮して、自動的に255を引くかどうか（デフォルトはfalse）
+*/
+void set_frequency_for_uart(int motor, int frequency, bool useAutoConversion = false)
+{
+  if (!useAutoConversion)
+  {
+    analogWrite(pwm[motor], frequency);
+  }
+  else
+  {
+    if (motor == 0 || motor == 3)
+    {
+      analogWrite(pwm[motor], 255 - frequency);
+    }
+    else
+    {
+      analogWrite(pwm[motor], frequency);
+    }
+  }
+}
+
 // 　TODO: Setup関数内で初期値を設定させるので、電源投下時を0として計算させる。
 // 　      もしくは、回路を変更させずに絶対値にするのもあり。
-
 double errorRange = 2; // 2度の誤差を許容する
 
 void loop()
