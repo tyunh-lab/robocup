@@ -96,7 +96,6 @@ void detectOrangeColor()
             // Serial.println("found orange pixel");
         }
     }
-    detectOrangeColor(fb);
     esp_camera_fb_return(fb); // メモリ解放
     Serial.printf("Orange pixels: %d\n", orangePixelCount);
 }
