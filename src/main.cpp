@@ -182,138 +182,123 @@
 
 TaskHandle_t thp[1];
 
-// モーター設定
-int motorPin[] = {12, 14, 26, 27};
+// // モーター設定
+// int motorPin[] = {12, 14, 26, 27};
 
-#define HIGH 200
-#define LOW 55
+// #define HIGH 200
+// #define LOW 55
 
-// 機体の動作方向(0:停止, 1:前進, 2:後退, 3:左, 4:右)
-// int stats = 0;
+// // モーター制御権限緊急停止に使う予定 (-1はマスター)
+// int privilegeCore = 1;
 
-// モーター制御権限(重複実行防止)
-// int privilegeCore = 0;
-int privilegeCore = 1;
+// // 　モーター指示
+// int order = 0;
 
-// 　モーター指示
-int order = 0;
+// void stop(int core)
+// {
+//   if (privilegeCore != core)
+//     return;
+//   ledcWrite(0, 128);
+//   ledcWrite(1, 120);
+//   ledcWrite(2, 130);
+//   ledcWrite(3, 118);
+// }
+// void foward(int core)
+// {
+//   if (privilegeCore != core)
+//     return;
+//   ledcWrite(0, LOW);
+//   ledcWrite(1, HIGH);
+//   ledcWrite(2, HIGH);
+//   ledcWrite(3, LOW);
+// }
+// void back(int core)
+// {
+//   if (privilegeCore != core)
+//     return;
+//   ledcWrite(0, HIGH);
+//   ledcWrite(1, LOW);
+//   ledcWrite(2, LOW);
+//   ledcWrite(3, HIGH);
+// }
+// void left(int core)
+// {
+//   if (privilegeCore != core)
+//     return;
+//   ledcWrite(0, LOW);
+//   ledcWrite(1, LOW);
+//   ledcWrite(2, HIGH);
+//   ledcWrite(3, HIGH);
+// }
+// void right(int core)
+// {
+//   if (privilegeCore != core)
+//     return;
+//   ledcWrite(0, HIGH);
+//   ledcWrite(1, HIGH);
+//   ledcWrite(2, LOW);
+//   ledcWrite(3, LOW);
+// }
 
-void stop(int core)
-{
-  if (privilegeCore != core)
-    return;
-  ledcWrite(0, 128);
-  ledcWrite(1, 120);
-  ledcWrite(2, 130);
-  ledcWrite(3, 118);
-}
-void foward(int core)
-{
-  if (privilegeCore != core)
-    return;
-  ledcWrite(0, LOW);
-  ledcWrite(1, HIGH);
-  ledcWrite(2, HIGH);
-  ledcWrite(3, LOW);
-}
-void back(int core)
-{
-  if (privilegeCore != core)
-    return;
-  ledcWrite(0, HIGH);
-  ledcWrite(1, LOW);
-  ledcWrite(2, LOW);
-  ledcWrite(3, HIGH);
-}
-void left(int core)
-{
-  if (privilegeCore != core)
-    return;
-  ledcWrite(0, LOW);
-  ledcWrite(1, LOW);
-  ledcWrite(2, HIGH);
-  ledcWrite(3, HIGH);
-}
-void right(int core)
-{
-  if (privilegeCore != core)
-    return;
-  ledcWrite(0, HIGH);
-  ledcWrite(1, HIGH);
-  ledcWrite(2, LOW);
-  ledcWrite(3, LOW);
-}
-void turnl(int core)
-{
-  if (privilegeCore != core)
-    return;
-  ledcWrite(0, HIGH);
-  ledcWrite(1, HIGH);
-  ledcWrite(2, HIGH);
-  ledcWrite(3, HIGH);
-}
-void turnr(int core)
-{
-  if (privilegeCore != core)
-    return;
-  ledcWrite(0, LOW);
-  ledcWrite(1, LOW);
-  ledcWrite(2, LOW);
-  ledcWrite(3, LOW);
-}
+// void turnl(int core, double angle)
+// {
+//   if (privilegeCore != core)
+//     return;
+//   Serial.println("turnl:" + String(abs(angle)));
+//   ledcWrite(0, LOW + (abs(angle) / 20));
+//   ledcWrite(1, LOW + (abs(angle) / 20));
+//   ledcWrite(2, LOW + (abs(angle) / 20));
+//   ledcWrite(3, LOW + (abs(angle) / 20));
+// }
+// void turnr(int core, double angle)
+// {
+//   if (privilegeCore != core)
+//     return;
+//   Serial.println("turnr:" + String(angle));
+//   ledcWrite(0, HIGH - (angle / 20));
+//   ledcWrite(1, HIGH - (angle / 20));
+//   ledcWrite(2, HIGH - (angle / 20));
+//   ledcWrite(3, HIGH - (angle / 20));
+// }
 
 void loop()
 {
+  detectOrangeColor();
+  delay(10000);
   // メインループ (core 0)
-  // Serial.println("line sensor value: " + String(analogRead(15)));
+  // analogRead(15)がラインセンサーの値
+  // delay(50);
+  // if (analogRead(15) >= 35)
+  // {
+  //   Serial.println(String(order));
+  //   switch (order)
+  //   {
+  //   case 0:
+  //     order = 1;
+  //     break;
 
-  delay(50);
-  if (analogRead(15) >= 20)
-  {
-    Serial.println(String(order));
-    switch (order)
-    {
-    case 0:
-      // privilegeCore = 0;
-      order = 1;
-      // privilegeCore = 1;
-      break;
+  //   case 1:
+  //     order = 0;
+  //     break;
 
-    case 1:
-      // privilegeCore = 0;
-      order = 0;
-      // privilegeCore = 1;
-      break;
+  //   case 2:
+  //     order = 3;
+  //     break;
 
-    case 2:
-      // privilegeCore = 0;
-      order = 3;
-      // privilegeCore = 1;
-      break;
+  //   case 3:
+  //     order = 2;
+  //     break;
 
-    case 3:
-      // privilegeCore = 0;
-      order = 2;
-      // privilegeCore = 1;
-      break;
-
-    default:
-      Serial.println("something wrong!");
-      order = 1;
-      break;
-    }
-  }
-  else
-  {
-    order - 1;
-  }
-}
-
-// for Core0a
-void doStop()
-{
-  stop(1);
-  delay(200);
+  //   default:
+  //     Serial.println("something wrong!");
+  //     order = 1;
+  //     break;
+  //   }
+  // }
+  // else
+  // {
+  //   order - 1;
+  // }
 }
 
 void Core0a(void *args)
@@ -321,40 +306,72 @@ void Core0a(void *args)
   while (1)
   {
     // サブで実行するプログラム (core 1)
-    if (order == 0)
-    {
-      foward(1);
-    }
-    else if (order == 1)
-    {
-      back(1);
-    }
-    else if (order == 2)
-    {
-      left(1);
-    }
-    else if (order == 3)
-    {
-      right(1);
-    }
-    else
-    {
-      // ボールに向かわせる
-      foward(1);
-      order = 0;
-    }
-    delay(1);
+    // if (order == 0)
+    // {
+    //   foward(1);
+    // }
+    // else if (order == 1)
+    // {
+    //   back(1);
+    // }
+    // else if (order == 2)
+    // {
+    //   left(1);
+    // }
+    // else if (order == 3)
+    // {
+    //   right(1);
+    // }
+    // else
+    // {
+    //   // ボールに向かわせる
+    //   order = 0;
+    // }
   }
 }
 
 void setup()
 {
-  for (int i = 0; i < 4; i++)
-  {
-    pinMode(motorPin[i], OUTPUT);
-    ledcSetup(i, 169000, 8); // 100kHz, 8bit(256段階)
-    ledcAttachPin(motorPin[i], i);
-  }
+  initCAM();
+  // for (int i = 0; i < 4; i++)
+  // {
+  //   pinMode(motorPin[i], OUTPUT);
+  //   ledcSetup(i, 169000, 8); // 100kHz, 8bit(256段階)
+  //   ledcAttachPin(motorPin[i], i);
+  // }
+
+  // Serial.print("jyro setupping....");
+  // Wire.setPins(21, 22);
+  // jy901.StartIIC();
+  // Serial.println("done");
+
+  // pinMode(2, OUTPUT);
+
   Serial.begin(115200);
-  xTaskCreatePinnedToCore(Core0a, "Core0a", 4096, NULL, 3, &thp[0], 0);
+  Serial.println("start");
+  for (int i = 0; i < 10; i++)
+  {
+    Serial.println("");
+  }
+  // xTaskCreatePinnedToCore(Core0a, "Core0a", 4096, NULL, 3, &thp[0], 0);
+  // stop(1);
+  // delay(500);
+  // jy901.GetAngle();
+  // double angle = (float)jy901.stcAngle.Angle[2] / 32768 * 180;
+  // if (angle > 10)
+  // {
+  //   turnl(1, angle);
+  // }
+  // else if (angle < -10)
+  // {
+  //   turnr(1, angle);
+  // }
+  // else
+  // {
+  //   order = 0;
+  // }
+
+  // digitalWrite(2, HIGH);
+  // delay(500);
+  // digitalWrite(2, LOW);
 }

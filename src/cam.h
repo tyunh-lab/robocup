@@ -38,7 +38,7 @@ void initCAM()
     //                      for larger pre-allocated frame buffer.
     if (psramFound())
     {
-        config.frame_size = FRAMESIZE_QQVGA;
+        config.frame_size = FRAMESIZE_QQVGA; //<-160×120
         config.jpeg_quality = 10;
         config.fb_count = 2;
     }
@@ -57,7 +57,6 @@ void initCAM()
     }
 }
 
-
 void detectOrangeColor()
 {
     camera_fb_t *fb = esp_camera_fb_get();
@@ -70,7 +69,6 @@ void detectOrangeColor()
     size_t pixelCount = fb->width * fb->height;
 
     int orangePixelCount = 0;
-
     // Serial.printf("pixelCount: %d\n", pixelCount);
     // Serial.printf("format: %d\n", fb->format);
 
@@ -84,18 +82,12 @@ void detectOrangeColor()
         r = (r * 255 + 15) / 31;
         g = (g * 255 + 31) / 63;
         b = (b * 255 + 15) / 31;
-
-        if (i == pixelCount / 2)
-        {
-            Serial.printf("%d, %d, %d\n", r, g, b);
-        }
         // オレンジ色の範囲を定義
         if (r >= 200 && g >= 100 && b <= 50)
         {
             orangePixelCount++;
-            // Serial.println("found orange pixel");
         }
     }
     esp_camera_fb_return(fb); // メモリ解放
-    Serial.printf("Orange pixels: %d\n", orangePixelCount);
+    // Serial.printf("Orange pixels: %d\n", orangePixelCount);
 }
