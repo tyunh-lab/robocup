@@ -1,20 +1,23 @@
 #include <Arduino.h>
 #include <pins.h>
 
+int ultrasonic_sensor_pins[4][2] = {
+    {FRONT_TRIG, FRONT_ECHO},
+    {LEFT_TRIG, LEFT_ECHO},
+    {RIGHT_TRIG, RIGHT_ECHO},
+    {BACK_TRIG, BACK_ECHO}};
+
 double duration = 0;
 double distance = 0;
 double speed_of_sound = 331.5 + 0.6 * 25; // 25℃の気温の想定
 
 void setupUltrasonicSensor()
 {
-    pinMode(FRONT_TRIG, OUTPUT);
-    pinMode(FRONT_ECHO, INPUT);
-    pinMode(LEFT_TRIG, OUTPUT);
-    pinMode(LEFT_ECHO, INPUT);
-    pinMode(RIGHT_TRIG, OUTPUT);
-    pinMode(RIGHT_ECHO, INPUT);
-    pinMode(BACK_TRIG, OUTPUT);
-    pinMode(BACK_ECHO, INPUT);
+    for (int i = 0; i < 4; i++)
+    {
+        pinMode(ultrasonic_sensor_pins[i][0], OUTPUT);
+        pinMode(ultrasonic_sensor_pins[i][1], INPUT);
+    }
 }
 
 /*
@@ -22,34 +25,14 @@ index 0: front
 index 1: left
 index 2: right
 index 3: back
+
+This function return the distance.
+Unit is cm.
 */
 double readUltrasonicSensor(int index)
 {
-    int trig, echo;
-
-    switch (index)
-    {
-    case 0:
-        trig = FRONT_TRIG;
-        echo = FRONT_ECHO;
-        break;
-    case 1:
-        trig = LEFT_TRIG;
-        echo = LEFT_ECHO;
-        break;
-    case 2:
-        trig = RIGHT_TRIG;
-        echo = RIGHT_ECHO;
-        break;
-    case 3:
-        trig = BACK_TRIG;
-        echo = BACK_ECHO;
-        break;
-
-    default:
-        Serial.println("Invalid index");
-        break;
-    }
+    int trig = ultrasonic_sensor_pins[index][0];
+    int echo = ultrasonic_sensor_pins[index][1];
 
     digitalWrite(trig, LOW);
     delayMicroseconds(2);
