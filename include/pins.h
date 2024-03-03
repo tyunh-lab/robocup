@@ -2,16 +2,32 @@
 #define UART_RX_PIN PC11
 #define UART_TX_PIN PC10
 // line sensor pins
-#define FRONT_LINE_SENSOR_PIN A0
-#define LEFT_LINE_SENSOR_PIN A1
-#define RIGHT_LINE_SENSOR_PIN A2
-#define BACK_LINE_SENSOR_PIN A3
+#define FRONT_LINE_SENSOR_PIN PB0
+#define LEFT_LINE_SENSOR_PIN PB1
+#define RIGHT_LINE_SENSOR_PIN PB3
+#define BACK_LINE_SENSOR_PIN PB2
 // ultrasonic sensor pins
-#define FRONT_TRIG D3
-#define FRONT_ECHO D2
-#define LEFT_TRIG D5
-#define LEFT_ECHO D4
-#define RIGHT_TRIG D7
-#define RIGHT_ECHO D6
-#define BACK_TRIG D9
-#define BACK_ECHO D8
+#define FRONT_TRIG PA0
+#define FRONT_ECHO PA1
+#define LEFT_TRIG PA4
+#define LEFT_ECHO PA5
+#define RIGHT_TRIG PC14
+#define RIGHT_ECHO PC13
+#define BACK_TRIG PA6
+#define BACK_ECHO PA7
+// kicker pins
+#define KICKER_PIN PA11
+// motor pins
+#define MOTOR1_PIN1 PB5
+#define MOTOR1_PIN2 PB6
+#define MOTOR2_PIN1 PB7
+#define MOTOR2_PIN2 PB8
+// dribbler pins
+#define DRIBBLER_MOTOR_PIN PA10
+#define BALL_SENSOR_PIN PB10
+// LED pin
+#define LED_PIN1 PC9
+#define LED_PIN2 PC8
+// jyro sensor pins
+#define JYLO_SCL PA8
+#define JYLO_SDA PB4
