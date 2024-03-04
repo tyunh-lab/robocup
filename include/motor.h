@@ -7,9 +7,9 @@ void initMotor()
 {
     for (int i = 0; i < 4; i++)
     {
-        ledcSetup(i, 12800, 8);
-        ledcAttachPin(motor_pins[i], i);
+        pinMode(motor_pins[i], OUTPUT);
     }
+    analogWriteFrequency(1000000); // 100kHz
 }
 
 void moveForward()
