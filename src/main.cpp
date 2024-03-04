@@ -55,10 +55,11 @@ void loop()
 
   // String i = Serial3.readString();
   // Serial.println(i);
-  if (Serial3.available())
-  {
-    String i = Serial3.readString();
-    Serial.println(i);
-    Serial3.println(String(front_line_sensor) + " " + String(left_line_sensor) + " " + String(right_line_sensor) + " " + String(back_line_sensor));
-  }
+  // if (Serial3.available())
+  // {
+  // String i = Serial3.readString();
+  // Serial.println(i);
+  // Serial3.println(String(front_line_sensor) + " " + String(left_line_sensor) + " " + String(right_line_sensor) + " " + String(back_line_sensor));
+  // }
+  Serial.println(String(front_line_sensor) + " " + String(left_line_sensor) + " " + String(right_line_sensor) + " " + String(back_line_sensor));
 }
