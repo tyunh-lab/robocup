@@ -25,9 +25,19 @@
 // dribbler pins
 #define DRIBBLER_MOTOR_PIN PA10
 #define BALL_SENSOR_PIN PB10
-// LED pin
-#define LED_PIN1 PC9
-#define LED_PIN2 PC8
 // jyro sensor pins
 #define JYLO_SCL PA8
 #define JYLO_SDA PB4
+// Buzzer pin
+#define BUZZER_PIN PC12
+// LED pin
+#define LED_PIN1 PC9
+#define LED_PIN2 PC8
+// toggle switch pin
+#define TOGGLE_SWITCH_PIN PC0
+// tact switch pin
+#define TACT_SWITCH_L_PIN PC1
+#define TACT_SWITCH_M_PIN PC2
+#define TACT_SWITCH_R_PIN PC3
+// tiny switch pin
+#define TINY_SWITCH_PIN PC4
