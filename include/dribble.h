@@ -10,17 +10,20 @@ void initDribbler()
     esc.writeMicroseconds(1000);    // サーボモータを初期位置に
 }
 
+// // 停止
+// esc.writeMicroseconds(1000);
+// delay(2000);
+
 void dribble()
 {
-    // // 停止
-    // esc.writeMicroseconds(1000);
-    // delay(2000);
     // ハーフスロットル
     esc.writeMicroseconds(1500);
-    // delay(2000);
-    // // フルスロットル
-    // esc.writeMicroseconds(2000);
-    // delay(2000);
+}
+
+void power_dribble()
+{
+    // フルスロットル
+    esc.writeMicroseconds(2000);
 }
 
 void stop_dribble()
