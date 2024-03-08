@@ -41,7 +41,6 @@ void initMotor()
     }
     analogWriteFrequency(500000); // 100kHz
 }
-
 void moveForward()
 {
     for (int i = 0; i < 4; i++)
