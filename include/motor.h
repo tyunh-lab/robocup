@@ -120,3 +120,25 @@ void moveRightBackward()
         analogWrite(motor_pins[i], right_backward[i]);
     }
 }
+
+void moveWith_angleCorrection(double now_angle)
+{
+    if (now_angle > 5)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            analogWrite(motor_pins[i], addSpeed(forward[i], left_rotate[i]));
+        }
+    }
+    else if (now_angle < -5)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            analogWrite(motor_pins[i], addSpeed(forward[i], right_rotate[i]));
+        }
+    }
+    else
+    {
+        moveForward();
+    }
+}
