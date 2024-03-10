@@ -5,10 +5,11 @@ int line_sensor_pins[4] = {FRONT_LINE_SENSOR_PIN, LEFT_LINE_SENSOR_PIN, RIGHT_LI
 
 void setupLineSensor()
 {
-    pinMode(FRONT_LINE_SENSOR_PIN, INPUT);
-    pinMode(LEFT_LINE_SENSOR_PIN, INPUT);
-    pinMode(RIGHT_LINE_SENSOR_PIN, INPUT);
-    pinMode(BACK_LINE_SENSOR_PIN, INPUT);
+    for (int i = 0; i < 4; i++)
+    {
+        Serial.println(line_sensor_pins[i]);
+        pinMode(line_sensor_pins[i], INPUT);
+    }
 }
 
 /*
