@@ -4,8 +4,8 @@
 // line sensor pins
 #define FRONT_LINE_SENSOR_PIN PB0
 #define LEFT_LINE_SENSOR_PIN PB1
-#define RIGHT_LINE_SENSOR_PIN PB3
 #define BACK_LINE_SENSOR_PIN PB2
+#define RIGHT_LINE_SENSOR_PIN PB3
 // ultrasonic sensor pins
 #define FRONT_TRIG PA0
 #define FRONT_ECHO PA1
