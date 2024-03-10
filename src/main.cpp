@@ -140,6 +140,7 @@ void setup()
   while (digitalRead(TOGGLE_SWITCH_PIN) == 0)
   {
     stop();
+    Serial3.println("0,0,0,0,0");
     delay(10);
   }
   Serial.println("Start signal received!");
@@ -147,41 +148,22 @@ void setup()
 
 void loop()
 {
-  angle = get_angle();
-  // moveForward();
+  face_forward(0);
+  makao();
+  delay(5000);
+  moveBackward();
+  delay(300);
+  stop();
+  delay(1000);
+  stop();
 
-  // face_forward();
-  // makao();
-  // delay(5000);
-  // moveBackward();
-  // delay(300);
-  // stop();
-  // delay(1000);
-
+  angle = get_angle() * -1;
   front_line_sensor = readLineSensor(0);
   left_line_sensor = readLineSensor(1);
   right_line_sensor = readLineSensor(2);
   back_line_sensor = readLineSensor(3);
-  delay(10);
 
-  Serial.println(angle);
-
-  if (stats == 0)
-  {
-    moveWith_angleCorrection(angle);
-    if (front_line_sensor > 1000)
-    {
-      stats = 1;
-    }
-  }
-  else
-  {
-    moveBackward();
-    if (back_line_sensor > 1000)
-    {
-      stats = 0;
-    }
-  }
+  Serial.println(String(angle) + "," + String(motor_power[0]) + "," + String(motor_power[1]) + "," + String(motor_power[2]) + "," + String(motor_power[3]));
 
   // front_distance = readUltrasonicSensor(0);
   // left_distance = readUltrasonicSensor(1);
@@ -191,11 +173,30 @@ void loop()
   // uart
   if (Serial3.available())
   {
-    String i = Serial3.readString();
-    Serial.println(i);
-    Serial3.println(String(front_line_sensor) + " " + String(left_line_sensor) + " " + String(right_line_sensor) + " " + String(back_line_sensor));
+    // String i = Serial3.readString();
+    // Serial.println(i);
+    Serial3.println(String(angle) + "," + String(motor_power[0]) + "," + String(motor_power[1]) + "," + String(motor_power[2]) + "," + String(motor_power[3]));
   }
+  // moveWith_angleCorrection(angle);
+  delay(100);
 
   // Serial.println(String(front_distance) + "cm\t" + String(left_distance) + "cm\t" + String(right_distance) + "cm\t" + String(back_distance) + "cm\t");
   // Serial.println(String(front_line_sensor) + " " + String(left_line_sensor) + " " + String(right_line_sensor) + " " + String(back_line_sensor));
+
+  // if (stats == 0)
+  // {
+  //   moveWith_angleCorrection(angle);
+  //   if (front_line_sensor > 1000)
+  //   {
+  //     stats = 1;
+  //   }
+  // }
+  // else
+  // {
+  //   moveBackward();
+  //   if (back_line_sensor > 1000)
+  //   {
+  //     stats = 0;
+  //   }
+  // }
 }

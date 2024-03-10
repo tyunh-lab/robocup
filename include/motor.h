@@ -1,7 +1,10 @@
 #include <Arduino.h>
+#include <manager.h>
 #include <pins.h>
 
 int motor_pins[4] = {MOTOR1_PIN1, MOTOR1_PIN2, MOTOR2_PIN1, MOTOR2_PIN2};
+
+int motor_power_index[4] = {1, 1, 1, -1};
 
 int forward[4] = {56, 200, 56, 56};
 int left[4] = {200, 200, 56, 200};
@@ -127,6 +130,7 @@ void moveWith_angleCorrection(double now_angle)
     {
         for (int i = 0; i < 4; i++)
         {
+            set_motor(i, addSpeed(forward[i], left_rotate[i]));
             analogWrite(motor_pins[i], addSpeed(forward[i], left_rotate[i]));
         }
     }
@@ -134,6 +138,7 @@ void moveWith_angleCorrection(double now_angle)
     {
         for (int i = 0; i < 4; i++)
         {
+            set_motor(i, addSpeed(forward[i], right_rotate[i]));
             analogWrite(motor_pins[i], addSpeed(forward[i], right_rotate[i]));
         }
     }
