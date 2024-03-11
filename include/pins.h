@@ -1,3 +1,6 @@
+#ifndef PINS
+#define PINS
+
 // uart pins
 #define UART_RX_PIN PC11
 #define UART_TX_PIN PC10
@@ -41,3 +44,5 @@
 #define TACT_SWITCH_R_PIN PC3
 // tiny switch pin
 #define TINY_SWITCH_PIN PC4
+
+#endif

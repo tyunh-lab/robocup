@@ -1,3 +1,5 @@
+#ifndef MANAGER_H
+#define MANAGER_H
 
 int motor_power[4] = {128, 128, 128, 128};
 
@@ -13,3 +15,5 @@ void set_motor(int index, int power)
     }
     motor_power[index] = power;
 }
+
+#endif

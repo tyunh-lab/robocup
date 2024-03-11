@@ -1,6 +1,9 @@
 #include <Arduino.h>
 #include <pins.h>
 
+#ifndef ROBOCUP_ULTRASONIC_SENSOR
+#define ROBOCUP_ULTRASONIC_SENSOR
+
 int ultrasonic_sensor_pins[4][2] = {
     {FRONT_TRIG, FRONT_ECHO},
     {LEFT_TRIG, LEFT_ECHO},
@@ -48,3 +51,5 @@ double readUltrasonicSensor(int index)
     }
     return distance;
 }
+
+#endif

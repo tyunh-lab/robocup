@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 int melody[] = {
     165,
     220,

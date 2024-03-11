@@ -2,6 +2,9 @@
 #include <manager.h>
 #include <pins.h>
 
+#ifndef ROBOCUP_MOTOR
+#define ROBOCUP_MOTOR
+
 int motor_pins[4] = {MOTOR1_PIN1, MOTOR1_PIN2, MOTOR2_PIN1, MOTOR2_PIN2};
 
 int motor_power_index[4] = {1, 1, 1, -1};
@@ -147,3 +150,5 @@ void moveWith_angleCorrection(double now_angle)
         moveForward();
     }
 }
+
+#endif

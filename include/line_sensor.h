@@ -1,6 +1,9 @@
 #include <Arduino.h>
 #include <pins.h>
 
+#ifndef ROBOCUP_LINE_SENSOR
+#define ROBOCUP_LINE_SENSOR
+
 int line_sensor_pins[4] = {FRONT_LINE_SENSOR_PIN, LEFT_LINE_SENSOR_PIN, RIGHT_LINE_SENSOR_PIN, BACK_LINE_SENSOR_PIN};
 
 void setupLineSensor()
@@ -24,3 +27,5 @@ int readLineSensor(int index)
 {
     return analogRead(line_sensor_pins[index]);
 }
+
+#endif

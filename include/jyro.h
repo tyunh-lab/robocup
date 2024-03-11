@@ -2,6 +2,9 @@
 #include <Wire.h>
 #include <JY901.h>
 
+#ifndef ROBOCUP_JYRO
+#define ROBOCUP_JYRO
+
 CJY901 jy901;
 
 // セットアップ //
@@ -135,3 +138,5 @@ void jyro_get_gpsv()
     Serial.print((float)jy901.stcGPSV.lGPSVelocity / 1000);
     Serial.println("km/h");
 }
+
+#endif

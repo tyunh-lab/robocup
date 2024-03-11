@@ -1,3 +1,8 @@
+#include <Arduino.h>
+#include <jyro.h>
+#include <motor.h>
+#include <kicker.h>
+
 void face_forward(double angle)
 {
     angle = get_angle();
