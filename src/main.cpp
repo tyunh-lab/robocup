@@ -148,14 +148,16 @@ void setup()
 
 void loop()
 {
-  face_forward(0);
-  makao();
-  delay(5000);
-  moveBackward();
-  delay(300);
-  stop();
-  delay(1000);
-  stop();
+  // face_forward(0);
+  // makao();
+  // delay(5000);
+  // moveBackward();
+  // delay(300);
+  // stop();
+  // delay(1000);
+  // stop();
+
+  moveForward();
 
   angle = get_angle() * -1;
   front_line_sensor = readLineSensor(0);
