@@ -2,6 +2,9 @@
 #include <Servo.h>
 #include <pins.h>
 
+#ifndef ROBOCUP_DRIBBLE
+#define ROBOCUP_DRIBBLE
+
 Servo esc; // Servoオブジェクトを作成
 
 void initDribbler()
@@ -30,3 +33,5 @@ void stop_dribble()
 {
     esc.writeMicroseconds(1000);
 }
+
+#endif
