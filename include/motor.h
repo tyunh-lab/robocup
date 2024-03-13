@@ -9,27 +9,27 @@ int motor_pins[4] = {MOTOR1_PIN1, MOTOR1_PIN2, MOTOR2_PIN1, MOTOR2_PIN2};
 
 int motor_power_index[4] = {1, 1, 1, -1};
 
-int forward[4] = {56, 200, 56, 56};
-int left[4] = {200, 200, 56, 200};
-int backward[4] = {200, 56, 200, 200};
-int right[4] = {56, 56, 200, 56};
+int forward[4] = {56, 200, 56, 200};
+int left[4] = {200, 200, 56, 56};
+int backward[4] = {200, 56, 200, 56};
+int right[4] = {56, 56, 200, 200};
 
-int left_rotate[4] = {200, 200, 200, 56};
-int right_rotate[4] = {56, 56, 56, 200};
+int left_rotate[4] = {200, 200, 200, 200};
+int right_rotate[4] = {56, 56, 56, 56};
 
 int left_forward[4] = {126, 180, 76, 126};
-int left_backward[4] = {180, 126, 126, 180};
+int left_backward[4] = {180, 126, 126, 76};
 
-int right_forward[4] = {76, 126, 126, 76};
+int right_forward[4] = {76, 126, 126, 180};
 int right_backward[4] = {126, 76, 180, 126};
 
 int addSpeed(int original_speed, int add_speed)
 {
-    if (original_speed >= 127)
+    if (original_speed >= 128)
     {
         return min(original_speed + add_speed, 250);
     }
-    else if (original_speed <= 126)
+    else if (original_speed < 128)
     {
         return max(original_speed - add_speed, 5);
     }
@@ -95,7 +95,7 @@ void stop()
 {
     for (int i = 0; i < 4; i++)
     {
-        analogWrite(motor_pins[i], 125);
+        analogWrite(motor_pins[i], 128);
     }
 }
 void moveLeftForward()
@@ -129,25 +129,77 @@ void moveRightBackward()
 
 void moveWith_angleCorrection(double now_angle)
 {
-    if (now_angle > 5)
+    if (now_angle > 10)
     {
         for (int i = 0; i < 4; i++)
         {
-            set_motor(i, addSpeed(forward[i], left_rotate[i]));
-            analogWrite(motor_pins[i], addSpeed(forward[i], left_rotate[i]));
+            if (i % 2 == 1)
+            {
+                set_motor(i, addSpeed(forward[i], 35));
+                analogWrite(motor_pins[i], addSpeed(forward[i], 35));
+            }
+            else
+            {
+                set_motor(i, forward[i]);
+                analogWrite(motor_pins[i], forward[i]);
+            }
         }
     }
-    else if (now_angle < -5)
+    else if (now_angle < -10)
     {
         for (int i = 0; i < 4; i++)
         {
-            set_motor(i, addSpeed(forward[i], right_rotate[i]));
-            analogWrite(motor_pins[i], addSpeed(forward[i], right_rotate[i]));
+            if (i % 2 == 0)
+            {
+                set_motor(i, addSpeed(forward[i], 35));
+                analogWrite(motor_pins[i], addSpeed(forward[i], 35));
+            }
+            else
+            {
+                set_motor(i, forward[i]);
+                analogWrite(motor_pins[i], forward[i]);
+            }
         }
     }
     else
     {
+        set_motor(0, forward[0]);
+        set_motor(1, forward[1]);
+        set_motor(2, forward[2]);
+        set_motor(3, forward[3]);
         moveForward();
+    }
+}
+
+void test_motor(int index, bool all = false)
+{
+    if (index != -1)
+    {
+
+        stop();
+        analogWrite(motor_pins[index], 254);
+    }
+    if (all)
+    {
+        moveForward();
+        delay(3000);
+        moveLeft();
+        delay(3000);
+        moveBackward();
+        delay(3000);
+        moveRight();
+        delay(3000);
+        stop();
+        delay(3000);
+
+        rotateLeft(200);
+        delay(1000);
+        stop();
+        delay(1000);
+        rotateRight(200);
+        delay(1000);
+        stop();
+        delay(1000);
     }
 }
 
