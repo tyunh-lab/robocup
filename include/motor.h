@@ -23,6 +23,21 @@ int left_backward[4] = {180, 126, 126, 76};
 int right_forward[4] = {76, 126, 126, 180};
 int right_backward[4] = {126, 76, 180, 126};
 
+// PID制御のパラメータ
+float Kp = 1.0;
+float Ki = 0.0;
+float Kd = 0.0;
+
+// PID制御器の初期値
+float integral = 0;
+float prev_error = 0;
+
+// 目標値 (0度)
+float target_angle = 0;
+
+// 制御周期 (ミリ秒) <-いるかわからん
+unsigned long dt = 100;
+
 int addSpeed(int original_speed, int add_speed)
 {
     if (original_speed >= 128)
@@ -37,6 +52,17 @@ int addSpeed(int original_speed, int add_speed)
     {
         return original_speed;
     }
+}
+
+float pidControl(float currentAngle)
+{
+    float error = target_angle - currentAngle;
+    integral = integral + error * dt / 1000.0;
+    float derivative = (error - prev_error) / (dt / 1000.0);
+    float output = Kp * error + Ki * integral + Kd * derivative;
+    prev_error = error;
+    delay(dt);
+    return output;
 }
 
 void initMotor()
