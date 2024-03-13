@@ -72,7 +72,7 @@ void jyro_get_angle()
 float get_angle()
 {
     jy901.GetAngle();
-    return (float)jy901.stcAngle.Angle[2] / 32768 * 180;
+    return (float)jy901.stcAngle.Angle[2] / 32768 * 180 * -1;
 }
 
 // 地磁気x, y, z//
