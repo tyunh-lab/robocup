@@ -17,10 +17,15 @@ void initDribbler()
 // esc.writeMicroseconds(1000);
 // delay(2000);
 
-void dribble()
+void low_dribble()
 {
     // ハーフスロットル
     esc.writeMicroseconds(1500);
+}
+
+void middle_dribble()
+{
+    esc.writeMicroseconds(1750);
 }
 
 void power_dribble()
