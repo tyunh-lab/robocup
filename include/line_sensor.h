@@ -10,7 +10,6 @@ void setupLineSensor()
 {
     for (int i = 0; i < 4; i++)
     {
-        Serial.println(line_sensor_pins[i]);
         pinMode(line_sensor_pins[i], INPUT);
     }
 }
