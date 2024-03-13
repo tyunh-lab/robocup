@@ -46,17 +46,16 @@ void off_led(void)
 void makao()
 {
   angle = get_angle();
-  double target_angle = angle + 90;
-  rotateLeft(200);
-  while (angle < target_angle)
-  {
-    power_dribble();
-    angle = get_angle();
-  }
+  double target_angle = angle + 45;
+  rotateLeft(20);
+  power_dribble();
+  delay(300);
   kick();
-  delay(30);
+  delay(100);
+  middle_dribble();
+  face_forward(angle);
   stop();
-  dribble();
+  delay(4000);
 }
 
 /*
@@ -144,33 +143,54 @@ void setup()
     delay(10);
   }
   Serial.println("Start signal received!");
+  delay(1000);
+  moveBackward();
+  // test motor
+  // for (int i = 0; i < 4; i++)
+  // {
+  //   test_motor(i);
+  //   Serial.println("test" + String(i) + " done");
+  //   delay(1000);
+  // }
+  // test_motor(0, true);
 }
 
 void loop()
 {
-  // face_forward(0);
+  angle = get_angle();
+  middle_dribble();
+
+  // test_motor(-1, true);
+
   // makao();
-  // delay(5000);
-  // moveBackward();
-  // delay(300);
-  // stop();
-  // delay(1000);
-  // stop();
-
-  moveForward();
-
-  angle = get_angle() * -1;
   front_line_sensor = readLineSensor(0);
   left_line_sensor = readLineSensor(1);
   right_line_sensor = readLineSensor(2);
   back_line_sensor = readLineSensor(3);
 
-  Serial.println(String(angle) + "," + String(motor_power[0]) + "," + String(motor_power[1]) + "," + String(motor_power[2]) + "," + String(motor_power[3]));
+  front_distance = readUltrasonicSensor(0);
+  left_distance = readUltrasonicSensor(1);
+  right_distance = readUltrasonicSensor(2);
+  back_distance = readUltrasonicSensor(3);
 
-  // front_distance = readUltrasonicSensor(0);
-  // left_distance = readUltrasonicSensor(1);
-  // right_distance = readUltrasonicSensor(2);
-  // back_distance = readUltrasonicSensor(3);
+  if (front_distance <= 30)
+  {
+    moveBackward();
+  }
+  else if (back_distance <= 30)
+  {
+    moveForward();
+  }
+  else if (left_distance <= 30)
+  {
+    moveRight();
+  }
+  else if (right_distance <= 30)
+  {
+    moveLeft();
+  }
+
+  // Serial.println(String(angle) + "," + String(motor_power[0]) + "," + String(motor_power[1]) + "," + String(motor_power[2]) + "," + String(motor_power[3]));
 
   // uart
   if (Serial3.available())
@@ -179,26 +199,19 @@ void loop()
     // Serial.println(i);
     Serial3.println(String(angle) + "," + String(motor_power[0]) + "," + String(motor_power[1]) + "," + String(motor_power[2]) + "," + String(motor_power[3]));
   }
-  // moveWith_angleCorrection(angle);
-  delay(100);
 
-  // Serial.println(String(front_distance) + "cm\t" + String(left_distance) + "cm\t" + String(right_distance) + "cm\t" + String(back_distance) + "cm\t");
-  // Serial.println(String(front_line_sensor) + " " + String(left_line_sensor) + " " + String(right_line_sensor) + " " + String(back_line_sensor));
+  Serial.println(String(front_distance) + "cm\t" + String(left_distance) + "cm\t" + String(right_distance) + "cm\t" + String(back_distance) + "cm\t");
+  Serial.println(String(front_line_sensor) + " " + String(left_line_sensor) + " " + String(right_line_sensor) + " " + String(back_line_sensor));
 
-  // if (stats == 0)
-  // {
-  //   moveWith_angleCorrection(angle);
-  //   if (front_line_sensor > 1000)
-  //   {
-  //     stats = 1;
-  //   }
-  // }
-  // else
-  // {
-  //   moveBackward();
-  //   if (back_line_sensor > 1000)
-  //   {
-  //     stats = 0;
-  //   }
-  // }
+  // Serial.println("angle: " + String(angle) + "°");
+  // Serial.println("motor0:" + String(motor_power[0]) + " motor1:" + String(motor_power[1]) + " motor2:" + String(motor_power[2]) + " motor3:" + String(motor_power[3]));
+  delay(150);
+  if (angle <= 10 && angle >= -10)
+  {
+    digitalWrite(LED_PIN2, HIGH);
+  }
+  else
+  {
+    digitalWrite(LED_PIN2, LOW);
+  }
 }
