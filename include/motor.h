@@ -163,9 +163,8 @@ void moveWith_angleCorrection(double angle)
     }
 }
 
-void face_forward(double angle, double target_angle)
+void face_forward(double angle)
 {
-    Setpoint = target_angle;
     Input = angle;
     pid_roll.Compute();
     for (int i = 0; i < 4; i++)
