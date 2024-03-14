@@ -112,6 +112,10 @@ void setup()
   Serial3.begin(115200);
   Serial.println("done");
 
+  Serial.print("Setup pid...");
+  pid_setup();
+  Serial.println("done");
+
   Serial.println("Setup complete!");
   for (int i = 0; i < 5; i++)
   {
@@ -143,8 +147,6 @@ void setup()
     delay(10);
   }
   Serial.println("Start signal received!");
-  delay(1000);
-  moveBackward();
   // test motor
   // for (int i = 0; i < 4; i++)
   // {
@@ -158,7 +160,7 @@ void setup()
 void loop()
 {
   angle = get_angle();
-  middle_dribble();
+  // middle_dribble();
 
   // test_motor(-1, true);
 
@@ -172,23 +174,25 @@ void loop()
   left_distance = readUltrasonicSensor(1);
   right_distance = readUltrasonicSensor(2);
   back_distance = readUltrasonicSensor(3);
+  Serial.println("angle:" + String(angle) + "°");
+  pid_controll_motor(angle);
 
-  if (front_distance <= 30)
-  {
-    moveBackward();
-  }
-  else if (back_distance <= 30)
-  {
-    moveForward();
-  }
-  else if (left_distance <= 30)
-  {
-    moveRight();
-  }
-  else if (right_distance <= 30)
-  {
-    moveLeft();
-  }
+  // if (front_distance <= 30)
+  // {
+  //   moveBackward();
+  // }
+  // else if (back_distance <= 30)
+  // {
+  //   moveForward();
+  // }
+  // else if (left_distance <= 30)
+  // {
+  //   moveRight();
+  // }
+  // else if (right_distance <= 30)
+  // {
+  //   moveLeft();
+  // }
 
   // Serial.println(String(angle) + "," + String(motor_power[0]) + "," + String(motor_power[1]) + "," + String(motor_power[2]) + "," + String(motor_power[3]));
 
@@ -200,12 +204,11 @@ void loop()
     Serial3.println(String(angle) + "," + String(motor_power[0]) + "," + String(motor_power[1]) + "," + String(motor_power[2]) + "," + String(motor_power[3]));
   }
 
-  Serial.println(String(front_distance) + "cm\t" + String(left_distance) + "cm\t" + String(right_distance) + "cm\t" + String(back_distance) + "cm\t");
-  Serial.println(String(front_line_sensor) + " " + String(left_line_sensor) + " " + String(right_line_sensor) + " " + String(back_line_sensor));
+  // Serial.println(String(front_distance) + "cm \t" + String(left_distance) + "cm\t" + String(right_distance) + "cm\t" + String(back_distance) + "cm\t");
+  // Serial.println(String(front_line_sensor) + " " + String(left_line_sensor) + " " + String(right_line_sensor) + " " + String(back_line_sensor));
 
   // Serial.println("angle: " + String(angle) + "°");
   // Serial.println("motor0:" + String(motor_power[0]) + " motor1:" + String(motor_power[1]) + " motor2:" + String(motor_power[2]) + " motor3:" + String(motor_power[3]));
-  delay(150);
   if (angle <= 10 && angle >= -10)
   {
     digitalWrite(LED_PIN2, HIGH);
