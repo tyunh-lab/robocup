@@ -35,11 +35,11 @@ void pid_setup()
     pid_roll.SetMode(AUTOMATIC);
     pid_roll.SetSampleTime(5);
     pid_roll.SetOutputLimits(-125, 125);
+    Setpoint = 0;
 }
 
 void pid_controll_motor(double angle)
 {
-    Setpoint = 0;
     Input = angle;
     pid_roll.Compute();
     Serial.println(Output);
@@ -48,21 +48,6 @@ void pid_controll_motor(double angle)
         analogWrite(motor_pins[i], 128 - Output);
     }
 }
-
-// // PID制御のパラメータ
-// float Kp = 1.0;
-// float Ki = 0.0;
-// float Kd = 0.0;
-
-// // PID制御器の初期値
-// float integral = 0;
-// float prev_error = 0;
-
-// // 目標値 (0度)
-// float target_angle = 0;
-
-// // 制御周期 (ミリ秒) <-いるかわからん
-// unsigned long dt = 100;
 
 int addSpeed(int original_speed, int add_speed)
 {
@@ -79,17 +64,6 @@ int addSpeed(int original_speed, int add_speed)
         return original_speed;
     }
 }
-
-// float pidControl(float currentAngle)
-// {
-//     float error = target_angle - currentAngle;
-//     integral = integral + error * dt / 1000.0;
-//     float derivative = (error - prev_error) / (dt / 1000.0);
-//     float output = Kp * error + Ki * integral + Kd * derivative;
-//     prev_error = error;
-//     delay(dt);
-//     return output;
-// }
 
 void initMotor()
 {
@@ -179,47 +153,24 @@ void moveRightBackward()
     }
 }
 
-void moveWith_angleCorrection(double now_angle)
+void moveWith_angleCorrection(double angle)
 {
-    if (now_angle > 10)
+    Input = angle;
+    pid_roll.Compute();
+    for (int i = 0; i < 4; i++)
     {
-        for (int i = 0; i < 4; i++)
-        {
-            if (i % 2 == 1)
-            {
-                set_motor(i, addSpeed(forward[i], 35));
-                analogWrite(motor_pins[i], addSpeed(forward[i], 35));
-            }
-            else
-            {
-                set_motor(i, forward[i]);
-                analogWrite(motor_pins[i], forward[i]);
-            }
-        }
+        analogWrite(motor_pins[i], addSpeed(forward[i], -Output));
     }
-    else if (now_angle < -10)
+}
+
+void face_forward(double angle, double target_angle)
+{
+    Setpoint = target_angle;
+    Input = angle;
+    pid_roll.Compute();
+    for (int i = 0; i < 4; i++)
     {
-        for (int i = 0; i < 4; i++)
-        {
-            if (i % 2 == 0)
-            {
-                set_motor(i, addSpeed(forward[i], 35));
-                analogWrite(motor_pins[i], addSpeed(forward[i], 35));
-            }
-            else
-            {
-                set_motor(i, forward[i]);
-                analogWrite(motor_pins[i], forward[i]);
-            }
-        }
-    }
-    else
-    {
-        set_motor(0, forward[0]);
-        set_motor(1, forward[1]);
-        set_motor(2, forward[2]);
-        set_motor(3, forward[3]);
-        moveForward();
+        analogWrite(motor_pins[i], addSpeed(128, -Output));
     }
 }
 
