@@ -31,6 +31,9 @@ int back_line_sensor = 0;
 
 double angle = 0;
 
+float start_angle = 0;
+bool isOutOfBounds = false;
+
 void on_led(void)
 {
   digitalWrite(LED_PIN1, HIGH);
@@ -53,17 +56,10 @@ void makao()
   kick();
   delay(100);
   middle_dribble();
-  face_forward(angle);
+  face_forward(angle, start_angle);
   stop();
   delay(4000);
 }
-
-/*
-0: forward
-1: backward
-*/
-int stats = 0;
-int times = 0;
 
 void setup()
 {
@@ -140,13 +136,45 @@ void setup()
   // dribble();
 
   Serial.println("Waiting for start signal...");
+
   while (digitalRead(TOGGLE_SWITCH_PIN) == 0)
   {
     stop();
     Serial3.println("0,0,0,0,0");
-    delay(10);
+    if (digitalRead(TACT_SWITCH_R_PIN) == 1)
+    {
+      Serial.println("out of bounds!");
+      isOutOfBounds = true;
+      start_angle = get_angle() - 180;
+      if (start_angle > 180)
+      {
+        start_angle -= 360;
+      }
+      else if (start_angle < -180)
+      {
+        start_angle += 360;
+      }
+      delay(10);
+    }
   }
-  Serial.println("Start signal received!");
+  Serial.println("Start signal received");
+  if (isOutOfBounds)
+  {
+    Serial.println("start_angle:" + String(start_angle) + "°");
+    while (!(angle - start_angle <= 10 && angle - start_angle >= -10))
+    {
+      angle = get_angle();
+      face_forward(angle, start_angle);
+      Serial.println("angle:" + String(angle - start_angle) + "°");
+    }
+  }
+  else
+  {
+    start_angle = get_angle();
+  }
+  isOutOfBounds = false;
+  Serial.println("Set up complete");
+
   // test motor
   // for (int i = 0; i < 4; i++)
   // {
@@ -159,12 +187,19 @@ void setup()
 
 void loop()
 {
-  angle = get_angle();
-  // middle_dribble();
-
   // test_motor(-1, true);
-
   // makao();
+
+  angle = get_angle() - start_angle;
+  if (angle > 180)
+  {
+    angle -= 360;
+  }
+  else if (angle < -180)
+  {
+    angle += 360;
+  }
+
   front_line_sensor = readLineSensor(0);
   left_line_sensor = readLineSensor(1);
   right_line_sensor = readLineSensor(2);
@@ -175,7 +210,8 @@ void loop()
   right_distance = readUltrasonicSensor(2);
   back_distance = readUltrasonicSensor(3);
   Serial.println("angle:" + String(angle) + "°");
-  pid_controll_motor(angle);
+  // pid_controll_motor(angle);
+  moveWith_angleCorrection(angle);
 
   // if (front_distance <= 30)
   // {
@@ -209,7 +245,7 @@ void loop()
 
   // Serial.println("angle: " + String(angle) + "°");
   // Serial.println("motor0:" + String(motor_power[0]) + " motor1:" + String(motor_power[1]) + " motor2:" + String(motor_power[2]) + " motor3:" + String(motor_power[3]));
-  if (angle <= 10 && angle >= -10)
+  if (angle - 10 <= angle - start_angle && angle + 10 >= angle - start_angle)
   {
     digitalWrite(LED_PIN2, HIGH);
   }
