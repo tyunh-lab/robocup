@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <manager.h>
 #include <pins.h>
+#include <PID_v1.h>
 
 #ifndef ROBOCUP_MOTOR
 #define ROBOCUP_MOTOR
@@ -23,20 +24,45 @@ int left_backward[4] = {180, 126, 126, 76};
 int right_forward[4] = {76, 126, 126, 180};
 int right_backward[4] = {126, 76, 180, 126};
 
-// PID制御のパラメータ
-float Kp = 1.0;
-float Ki = 0.0;
-float Kd = 0.0;
+// PIDライブラリ用
+double Setpoint, Input, Output;
 
-// PID制御器の初期値
-float integral = 0;
-float prev_error = 0;
+double Kp = 1, Ki = 0, Kd = 0.0005;
+PID pid_roll(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
 
-// 目標値 (0度)
-float target_angle = 0;
+void pid_setup()
+{
+    pid_roll.SetMode(AUTOMATIC);
+    pid_roll.SetSampleTime(5);
+    pid_roll.SetOutputLimits(-125, 125);
+}
 
-// 制御周期 (ミリ秒) <-いるかわからん
-unsigned long dt = 100;
+void pid_controll_motor(double angle)
+{
+    Setpoint = 0;
+    Input = angle;
+    pid_roll.Compute();
+    Serial.println(Output);
+    for (int i = 0; i < 4; i++)
+    {
+        analogWrite(motor_pins[i], 128 - Output);
+    }
+}
+
+// // PID制御のパラメータ
+// float Kp = 1.0;
+// float Ki = 0.0;
+// float Kd = 0.0;
+
+// // PID制御器の初期値
+// float integral = 0;
+// float prev_error = 0;
+
+// // 目標値 (0度)
+// float target_angle = 0;
+
+// // 制御周期 (ミリ秒) <-いるかわからん
+// unsigned long dt = 100;
 
 int addSpeed(int original_speed, int add_speed)
 {
@@ -54,16 +80,16 @@ int addSpeed(int original_speed, int add_speed)
     }
 }
 
-float pidControl(float currentAngle)
-{
-    float error = target_angle - currentAngle;
-    integral = integral + error * dt / 1000.0;
-    float derivative = (error - prev_error) / (dt / 1000.0);
-    float output = Kp * error + Ki * integral + Kd * derivative;
-    prev_error = error;
-    delay(dt);
-    return output;
-}
+// float pidControl(float currentAngle)
+// {
+//     float error = target_angle - currentAngle;
+//     integral = integral + error * dt / 1000.0;
+//     float derivative = (error - prev_error) / (dt / 1000.0);
+//     float output = Kp * error + Ki * integral + Kd * derivative;
+//     prev_error = error;
+//     delay(dt);
+//     return output;
+// }
 
 void initMotor()
 {
