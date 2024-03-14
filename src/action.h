@@ -3,23 +3,6 @@
 #include <motor.h>
 #include <kicker.h>
 
-void face_forward(double angle)
-{
-    angle = get_angle();
-    while (angle <= 12.5 && angle >= -12.5)
-    {
-        angle = get_angle();
-        if (angle >= 12.5)
-        {
-            rotateRight(angle / 2);
-        }
-        else if (angle <= -12.5)
-        {
-            rotateLeft(abs(angle) / 2);
-        }
-    }
-}
-
 void system_stop(void)
 {
     Serial.println("System stop");
