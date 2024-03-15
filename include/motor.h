@@ -35,12 +35,12 @@ void pid_setup()
     pid_roll.SetMode(AUTOMATIC);
     pid_roll.SetSampleTime(5);
     pid_roll.SetOutputLimits(-125, 125);
-    Setpoint = 0;
 }
 
 void pid_controll_motor(double angle)
 {
     Input = angle;
+    Setpoint = 0;
     pid_roll.Compute();
     Serial.println(Output);
     for (int i = 0; i < 4; i++)
@@ -155,11 +155,20 @@ void moveRightBackward()
 
 void moveWith_angleCorrection(double angle)
 {
+
     Input = angle;
     pid_roll.Compute();
+    Serial.println(Output);
     for (int i = 0; i < 4; i++)
     {
-        analogWrite(motor_pins[i], addSpeed(forward[i], -Output));
+        if (i % 2 == 0)
+        {
+            analogWrite(motor_pins[i], addSpeed(forward[i], -Output));
+        }
+        else
+        {
+            analogWrite(motor_pins[i], addSpeed(forward[i], Output));
+        }
     }
 }
 
@@ -169,7 +178,7 @@ void face_forward(double angle)
     pid_roll.Compute();
     for (int i = 0; i < 4; i++)
     {
-        analogWrite(motor_pins[i], addSpeed(128, -Output));
+        analogWrite(motor_pins[i], addSpeed(128, Output));
     }
 }
 
