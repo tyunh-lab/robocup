@@ -56,7 +56,7 @@ void makao()
   kick();
   delay(100);
   middle_dribble();
-  face_forward(angle, start_angle);
+  face_forward(angle);
   stop();
   delay(4000);
 }
@@ -145,34 +145,33 @@ void setup()
     {
       Serial.println("out of bounds!");
       isOutOfBounds = true;
-      start_angle = get_angle() - 180;
-      if (start_angle > 180)
-      {
-        start_angle -= 360;
-      }
-      else if (start_angle < -180)
-      {
-        start_angle += 360;
-      }
-      delay(10);
+      delay(20);
     }
   }
+  start_angle = get_angle();
   Serial.println("Start signal received");
-  if (isOutOfBounds)
+  if (isOutOfBounds) //<-out of boundsの時は前に向けてからloopに入る
   {
+    angle = start_angle - get_angle() + 180;
     Serial.println("start_angle:" + String(start_angle) + "°");
-    while (!(angle - start_angle <= 10 && angle - start_angle >= -10))
+    Serial.println("current_angle:" + String(get_angle()) + "°");
+    Serial.println("calced_angle:" + String(angle) + "°");
+    delay(500);
+    while (!(angle <= 10 && angle >= -10))
     {
-      angle = get_angle();
-      face_forward(angle, start_angle);
-      Serial.println("angle:" + String(angle - start_angle) + "°");
+      angle = start_angle - get_angle() + 180;
+      if (angle > 180)
+      {
+        angle -= 360;
+      }
+      else if (angle < -180)
+      {
+        angle += 360;
+      }
+      face_forward(angle);
+      Serial.println("angle:" + String(angle) + "°");
     }
   }
-  else
-  {
-    start_angle = get_angle();
-  }
-  isOutOfBounds = false;
   Serial.println("Set up complete");
 
   // test motor
@@ -190,7 +189,24 @@ void loop()
   // test_motor(-1, true);
   // makao();
 
-  angle = get_angle() - start_angle;
+  // front_line_sensor = readLineSensor(0);
+  // left_line_sensor = readLineSensor(1);
+  // right_line_sensor = readLineSensor(2);
+  // back_line_sensor = readLineSensor(3);
+
+  // front_distance = readUltrasonicSensor(0);
+  // left_distance = readUltrasonicSensor(1);
+  // right_distance = readUltrasonicSensor(2);
+  // back_distance = readUltrasonicSensor(3);
+  // angleの取得
+  if (isOutOfBounds)
+  {
+    angle = start_angle - get_angle() + 180;
+  }
+  else
+  {
+    angle = start_angle - get_angle();
+  }
   if (angle > 180)
   {
     angle -= 360;
@@ -199,19 +215,6 @@ void loop()
   {
     angle += 360;
   }
-
-  front_line_sensor = readLineSensor(0);
-  left_line_sensor = readLineSensor(1);
-  right_line_sensor = readLineSensor(2);
-  back_line_sensor = readLineSensor(3);
-
-  front_distance = readUltrasonicSensor(0);
-  left_distance = readUltrasonicSensor(1);
-  right_distance = readUltrasonicSensor(2);
-  back_distance = readUltrasonicSensor(3);
-  Serial.println("angle:" + String(angle) + "°");
-  // pid_controll_motor(angle);
-  moveWith_angleCorrection(angle);
 
   // if (front_distance <= 30)
   // {
@@ -235,22 +238,29 @@ void loop()
   // uart
   if (Serial3.available())
   {
-    // String i = Serial3.readString();
-    // Serial.println(i);
-    Serial3.println(String(angle) + "," + String(motor_power[0]) + "," + String(motor_power[1]) + "," + String(motor_power[2]) + "," + String(motor_power[3]));
-  }
-
-  // Serial.println(String(front_distance) + "cm \t" + String(left_distance) + "cm\t" + String(right_distance) + "cm\t" + String(back_distance) + "cm\t");
-  // Serial.println(String(front_line_sensor) + " " + String(left_line_sensor) + " " + String(right_line_sensor) + " " + String(back_line_sensor));
-
-  // Serial.println("angle: " + String(angle) + "°");
-  // Serial.println("motor0:" + String(motor_power[0]) + " motor1:" + String(motor_power[1]) + " motor2:" + String(motor_power[2]) + " motor3:" + String(motor_power[3]));
-  if (angle - 10 <= angle - start_angle && angle + 10 >= angle - start_angle)
-  {
-    digitalWrite(LED_PIN2, HIGH);
-  }
-  else
-  {
-    digitalWrite(LED_PIN2, LOW);
+    String i = Serial3.readString();
+    Serial.println(i);
+    // Serial3.println(String(angle) + "," + String(motor_power[0]) + "," + String(motor_power[1]) + "," + String(motor_power[2]) + "," + String(motor_power[3]));
   }
 }
+
+// #include <Arduino.h>
+// #include <pins.h>
+
+// HardwareSerial Serial3(UART_RX_PIN, UART_TX_PIN);
+
+// void setup()
+//{
+// Serial.begin(115200);
+// Serial3.begin(115200);
+// Serial.println("Hello, world!");
+//}
+
+// void loop()
+//  {
+//   if (Serial3.available())
+//   {
+//     String i = Serial3.readString();
+//     Serial.println(i);
+//   }
+//  }
