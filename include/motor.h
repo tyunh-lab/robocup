@@ -2,6 +2,7 @@
 #include <manager.h>
 #include <pins.h>
 #include <PID_v1.h>
+#include <jyro.h>
 
 #ifndef ROBOCUP_MOTOR
 #define ROBOCUP_MOTOR
@@ -11,9 +12,9 @@ int motor_pins[4] = {MOTOR1_PIN1, MOTOR1_PIN2, MOTOR2_PIN1, MOTOR2_PIN2};
 int motor_power_index[4] = {1, 1, 1, -1};
 
 int forward[4] = {56, 200, 56, 200};
-int left[4] = {200, 200, 56, 56};
+int left[4] = {168, 168, 88, 88};
 int backward[4] = {200, 56, 200, 56};
-int right[4] = {56, 56, 200, 200};
+int right[4] = {88, 88, 168, 168};
 
 int left_rotate[4] = {200, 200, 200, 200};
 int right_rotate[4] = {56, 56, 56, 56};
@@ -80,6 +81,7 @@ void moveForward()
         analogWrite(motor_pins[i], forward[i]);
     }
 }
+
 void moveLeft()
 {
     for (int i = 0; i < 4; i++)
@@ -155,7 +157,6 @@ void moveRightBackward()
 
 void moveWith_angleCorrection(double angle)
 {
-
     Input = angle;
     pid_roll.Compute();
     Serial.println(Output);
@@ -172,14 +173,44 @@ void moveWith_angleCorrection(double angle)
     }
 }
 
-void face_forward(double angle)
+void face_forward(double angle, double target_angle = 0)
 {
+    Serial.println("current:" + String(angle) + "°");
+    Serial.println("target:" + String(target_angle) + "°");
+    Serial.println("calced:" + String(angle + target_angle) + "°");
+    delay(1000);
     Input = angle;
-    pid_roll.Compute();
-    for (int i = 0; i < 4; i++)
+    Setpoint = angle - target_angle;
+    if (Setpoint > 180)
     {
-        analogWrite(motor_pins[i], addSpeed(128, Output));
+        Setpoint -= 360;
     }
+    else if (Setpoint < -180)
+    {
+        Setpoint += 360;
+    }
+    Serial.println("calced2:" + String(Setpoint) + "°");
+    while (abs(Input - Setpoint) > 5)
+    {
+        pid_roll.Compute();
+        Serial.print("target:" + String(Setpoint) + "\t");
+        Serial.print("current:" + String(angle) + "\t");
+        Serial.println("Output" + String(Output));
+        for (int i = 0; i < 4; i++)
+        {
+            if (i % 2 == 0)
+            {
+                analogWrite(motor_pins[i], addSpeed(forward[i], -Output));
+            }
+            else
+            {
+                analogWrite(motor_pins[i], addSpeed(forward[i], Output));
+            }
+        }
+        angle = get_angle_with_heading();
+        Input = angle;
+    }
+    stop();
 }
 
 void test_motor(int index, bool all = false)
