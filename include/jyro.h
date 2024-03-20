@@ -5,6 +5,9 @@
 #ifndef ROBOCUP_JYRO
 #define ROBOCUP_JYRO
 
+float start_angle = 0;
+bool isOutOfBounds = false;
+
 CJY901 jy901;
 
 // セットアップ //
@@ -73,6 +76,31 @@ float get_angle()
 {
     jy901.GetAngle();
     return (float)jy901.stcAngle.Angle[2] / 32768 * 180 * -1;
+}
+
+float get_angle_with_heading()
+{
+    jy901.GetAngle();
+    double f_angle = (float)jy901.stcAngle.Angle[2] / 32768 * 180 * -1;
+    Serial.println("angle:" + String(f_angle) + "°");
+    if (isOutOfBounds)
+    {
+        f_angle = start_angle - f_angle + 180;
+    }
+    else
+    {
+        f_angle = start_angle - f_angle;
+    }
+    if (f_angle > 180)
+    {
+        f_angle -= 360;
+    }
+    else if (f_angle < -180)
+    {
+        f_angle += 360;
+    }
+    // Serial.println("calced_angle:" + String(f_angle) + "°");
+    return f_angle;
 }
 
 // 地磁気x, y, z//
