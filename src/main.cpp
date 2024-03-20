@@ -16,6 +16,7 @@
 
 // その他
 #include <mero.h>
+#include <device_manager.h>
 
 HardwareSerial Serial3(UART_RX_PIN, UART_TX_PIN);
 
@@ -31,8 +32,8 @@ int back_line_sensor = 0;
 
 double angle = 0;
 
-float start_angle = 0;
-bool isOutOfBounds = false;
+int value = 0;
+bool isValid = false;
 
 void on_led(void)
 {
@@ -106,13 +107,13 @@ void setup()
 
   Serial.print("Starting UART...");
   Serial3.begin(115200);
+  Serial3.println("Hello, world!");
   Serial.println("done");
 
   Serial.print("Setup pid...");
   pid_setup();
   Serial.println("done");
 
-  Serial.println("Setup complete!");
   for (int i = 0; i < 5; i++)
   {
     digitalWrite(LED_PIN1, HIGH);
@@ -132,6 +133,8 @@ void setup()
   attachInterrupt(digitalPinToInterrupt(TOGGLE_SWITCH_PIN), system_stop, FALLING);
   attachInterrupt(digitalPinToInterrupt(TINY_SWITCH_PIN), kick, RISING);
 
+  Serial.println("Setup complete");
+
   playMelody(BUZZER_PIN);
   // dribble();
 
@@ -141,6 +144,7 @@ void setup()
   {
     stop();
     Serial3.println("0,0,0,0,0");
+
     if (digitalRead(TACT_SWITCH_R_PIN) == 1)
     {
       Serial.println("out of bounds!");
@@ -148,8 +152,8 @@ void setup()
       delay(20);
     }
   }
-  start_angle = get_angle();
   Serial.println("Start signal received");
+  start_angle = get_angle();
   if (isOutOfBounds) //<-out of boundsの時は前に向けてからloopに入る
   {
     angle = start_angle - get_angle() + 180;
@@ -172,7 +176,7 @@ void setup()
       Serial.println("angle:" + String(angle) + "°");
     }
   }
-  Serial.println("Set up complete");
+  Serial.println("Start main loop");
 
   // test motor
   // for (int i = 0; i < 4; i++)
@@ -184,64 +188,119 @@ void setup()
   // test_motor(0, true);
 }
 
+int times = 0;
+
 void loop()
 {
   // test_motor(-1, true);
   // makao();
 
-  // front_line_sensor = readLineSensor(0);
-  // left_line_sensor = readLineSensor(1);
-  // right_line_sensor = readLineSensor(2);
-  // back_line_sensor = readLineSensor(3);
-
-  // front_distance = readUltrasonicSensor(0);
-  // left_distance = readUltrasonicSensor(1);
-  // right_distance = readUltrasonicSensor(2);
-  // back_distance = readUltrasonicSensor(3);
   // angleの取得
-  if (isOutOfBounds)
+  angle = get_angle_with_heading();
+  // ラインセンサーの取得
+  front_line_sensor = readLineSensor(0);
+  left_line_sensor = readLineSensor(1);
+  right_line_sensor = readLineSensor(2);
+  back_line_sensor = readLineSensor(3);
+  // 超音波センサーの取得
+  front_distance = readUltrasonicSensor(0);
+  left_distance = readUltrasonicSensor(1);
+  right_distance = readUltrasonicSensor(2);
+  back_distance = readUltrasonicSensor(3);
+
+  delay(30);
+
+  isValid = false;
+  if (front_distance < 10)
   {
-    angle = start_angle - get_angle() + 180;
+    stop();
+    delay(500);
+    moveBackward();
+    delay(100);
+  }
+  else if (left_distance < 10)
+  {
+    stop();
+    delay(500);
+    moveRight();
+    delay(100);
+  }
+  else if (right_distance < 10)
+  {
+    stop();
+    delay(500);
+    moveLeft();
+    delay(100);
+  }
+  else if (back_distance < 10)
+  {
+    stop();
+    delay(500);
+    moveForward();
+    delay(100);
+  }
+  else if (Serial3.available() >= 3)
+  {
+    times = 0;
+    int head = Serial3.read();
+    if (head == 128)
+    {
+      int high = Serial3.read();
+      int low = Serial3.read();
+      value = (high << 7) + low;
+      Serial3.println(value, DEC);
+      if (0 <= value <= 1023)
+      {
+        isValid = true;
+      }
+      Serial.println("ball angle:" + String(value - 180) + "°");
+      value = value - 180;
+      if (17.5 < value && value <= 75)
+      {
+        Serial.println("right");
+        moveRight();
+        stop_dribble();
+        digitalWrite(LED_PIN1, LOW);
+      }
+      else if (-10 <= value && value <= 10)
+      {
+        Serial.println("forward");
+        moveForward();
+        middle_dribble();
+        digitalWrite(LED_PIN1, HIGH);
+      }
+      else if (-17.5 > value && value >= -75)
+      {
+        Serial.println("left");
+        moveLeft();
+        stop_dribble();
+        digitalWrite(LED_PIN1, LOW);
+      }
+      else
+      {
+        Serial.println("back");
+        moveBackward();
+        stop_dribble();
+        digitalWrite(LED_PIN1, LOW);
+      }
+    }
+    else
+    {
+      times += 1;
+    }
   }
   else
   {
-    angle = start_angle - get_angle();
-  }
-  if (angle > 180)
-  {
-    angle -= 360;
-  }
-  else if (angle < -180)
-  {
-    angle += 360;
+    times += 1;
   }
 
-  // if (front_distance <= 30)
-  // {
-  //   moveBackward();
-  // }
-  // else if (back_distance <= 30)
-  // {
-  //   moveForward();
-  // }
-  // else if (left_distance <= 30)
-  // {
-  //   moveRight();
-  // }
-  // else if (right_distance <= 30)
-  // {
-  //   moveLeft();
-  // }
-
-  // Serial.println(String(angle) + "," + String(motor_power[0]) + "," + String(motor_power[1]) + "," + String(motor_power[2]) + "," + String(motor_power[3]));
-
-  // uart
-  if (Serial3.available())
+  if (times >= 150)
   {
-    String i = Serial3.readString();
-    Serial.println(i);
-    // Serial3.println(String(angle) + "," + String(motor_power[0]) + "," + String(motor_power[1]) + "," + String(motor_power[2]) + "," + String(motor_power[3]));
+    // Serial.println("stop");
+    stop_dribble();
+    stop();
   }
+  delay(5);
 }
 
 // #include <Arduino.h>
