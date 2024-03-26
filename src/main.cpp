@@ -1,3 +1,48 @@
+// #include <Wire.h>
+// #include <jyro.h>
+// #include <pins.h>
+
+// void setup()
+// {
+//   Wire.setSCL(JYLO_SCL);
+//   Wire.setSDA(JYLO_SDA);
+//   Wire.begin();
+//   Serial.begin(115200);
+
+//   // Z軸調整モード
+//   Wire.beginTransmission(0x50); // J901との通信開始
+//   Wire.write(0x01);             // キャリブレーションモード選択
+//   Wire.write(0x03);             // 下位ビット
+//   Wire.write(0);                // 上位ビット
+//   Wire.endTransmission();       // 通信終了
+
+//   Serial.println("Z-axis calibration mode");
+
+//   delay(1000); // 待機時間）（任意）
+
+//   // 磁気センサキャリブレーションモード
+//   Wire.beginTransmission(0x50); // J901との通信開始
+//   Wire.write(0x01);             // キャリブレーションモード選択
+//   Wire.write(0x02);             // 下位ビット
+//   Wire.write(0);                // 上位ビット
+//   Wire.endTransmission();       // 通信終了
+
+//   delay(5000); // キャリブレーション時間（任意）
+
+//   // キャリブレーションモード終了
+//   Wire.beginTransmission(0x50); // J901との通信開始
+//   Wire.write(0x01);             // キャリブレーション
+//   Wire.write(0);                // 下位ビット
+//   Wire.write(0);                // 上位ビット
+//   Wire.endTransmission();       // 通信終了
+//   Serial.println("Calibration done");
+// }
+
+// void loop()
+// {
+//   get_angle_with_heading();
+// }
+
 #include <Arduino.h>
 #include <pins.h>
 
@@ -136,15 +181,17 @@ void setup()
   Serial.println("Setup complete");
 
   playMelody(BUZZER_PIN);
-  // dribble();
 
   Serial.println("Waiting for start signal...");
-
   while (digitalRead(TOGGLE_SWITCH_PIN) == 0)
   {
     stop();
-    Serial3.println("0,0,0,0,0");
-
+    delay(10);
+    if (digitalRead(TACT_SWITCH_L_PIN) == 1)
+    {
+      // motor test
+      test_motor(-1);
+    }
     if (digitalRead(TACT_SWITCH_R_PIN) == 1)
     {
       Serial.println("out of bounds!");
@@ -177,18 +224,10 @@ void setup()
     }
   }
   Serial.println("Start main loop");
-
-  // test motor
-  // for (int i = 0; i < 4; i++)
-  // {
-  //   test_motor(i);
-  //   Serial.println("test" + String(i) + " done");
-  //   delay(1000);
-  // }
-  // test_motor(0, true);
 }
 
 int times = 0;
+int holding = 0;
 
 void loop()
 {
@@ -196,51 +235,45 @@ void loop()
   // makao();
 
   // angleの取得
-  angle = get_angle_with_heading();
-  // ラインセンサーの取得
-  front_line_sensor = readLineSensor(0);
-  left_line_sensor = readLineSensor(1);
-  right_line_sensor = readLineSensor(2);
-  back_line_sensor = readLineSensor(3);
-  // 超音波センサーの取得
-  front_distance = readUltrasonicSensor(0);
-  left_distance = readUltrasonicSensor(1);
-  right_distance = readUltrasonicSensor(2);
-  back_distance = readUltrasonicSensor(3);
+  // angle = get_angle_with_heading();
 
-  delay(30);
+  // ラインセンサーの取得
+  // front_line_sensor = readLineSensor(0);
+  // left_line_sensor = readLineSensor(1);
+  // right_line_sensor = readLineSensor(2);
+  // back_line_sensor = readLineSensor(3);
+  // 超音波センサーの取得
+  // front_distance = readUltrasonicSensor(0);
+  // left_distance = readUltrasonicSensor(1);
+  // right_distance = readUltrasonicSensor(2);
+  // back_distance = readUltrasonicSensor(3);
 
   isValid = false;
-  if (front_distance < 10)
+
+  // if (front_distance < 10)
+  // {
+  //   moveBackward();
+  //   delay(100);
+  // }
+  // else if (left_distance < 10)
+  // {
+  //   moveRight();
+  //   delay(100);
+  // }
+  // else if (right_distance < 10)
+  // {
+  //   moveLeft();
+  //   delay(100);
+  // }
+  // else if (back_distance < 10)
+  // {
+  //   moveForward();
+  //   delay(100);
+  // }
+
+  if (Serial3.available() >= 3)
   {
-    stop();
-    delay(500);
-    moveBackward();
-    delay(100);
-  }
-  else if (left_distance < 10)
-  {
-    stop();
-    delay(500);
-    moveRight();
-    delay(100);
-  }
-  else if (right_distance < 10)
-  {
-    stop();
-    delay(500);
-    moveLeft();
-    delay(100);
-  }
-  else if (back_distance < 10)
-  {
-    stop();
-    delay(500);
-    moveForward();
-    delay(100);
-  }
-  else if (Serial3.available() >= 3)
-  {
+    digitalWrite(LED_PIN2, LOW);
     times = 0;
     int head = Serial3.read();
     if (head == 128)
@@ -249,12 +282,13 @@ void loop()
       int low = Serial3.read();
       value = (high << 7) + low;
       Serial3.println(value, DEC);
-      if (0 <= value <= 1023)
+      Serial.println(value);
+      if (0 <= value && value <= 1023)
       {
         isValid = true;
       }
       Serial.println("ball angle:" + String(value - 180) + "°");
-      value = value - 180;
+      value -= 180;
       if (17.5 < value && value <= 75)
       {
         Serial.println("right");
@@ -266,8 +300,15 @@ void loop()
       {
         Serial.println("forward");
         moveForward();
-        middle_dribble();
         digitalWrite(LED_PIN1, HIGH);
+        holding++;
+        if (holding >= 10)
+        {
+          holding = 0;
+          stop_dribble();
+          delay(50);
+          kick();
+        }
       }
       else if (-17.5 > value && value >= -75)
       {
@@ -276,7 +317,7 @@ void loop()
         stop_dribble();
         digitalWrite(LED_PIN1, LOW);
       }
-      else
+      else if (value > 75 || value < -75)
       {
         Serial.println("back");
         moveBackward();
@@ -291,35 +332,14 @@ void loop()
   }
   else
   {
+    Serial.println(times);
     times += 1;
   }
-
-  if (times >= 150)
+  if (times >= 900)
   {
-    // Serial.println("stop");
     stop_dribble();
     stop();
+    digitalWrite(LED_PIN2, HIGH);
+    times = 0;
   }
-  delay(5);
 }
-
-// #include <Arduino.h>
-// #include <pins.h>
-
-// HardwareSerial Serial3(UART_RX_PIN, UART_TX_PIN);
-
-// void setup()
-//{
-// Serial.begin(115200);
-// Serial3.begin(115200);
-// Serial.println("Hello, world!");
-//}
-
-// void loop()
-//  {
-//   if (Serial3.available())
-//   {
-//     String i = Serial3.readString();
-//     Serial.println(i);
-//   }
-//  }
