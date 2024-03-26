@@ -9,12 +9,10 @@
 
 int motor_pins[4] = {MOTOR1_PIN1, MOTOR1_PIN2, MOTOR2_PIN1, MOTOR2_PIN2};
 
-int motor_power_index[4] = {1, 1, 1, -1};
-
 int forward[4] = {56, 200, 56, 200};
-int left[4] = {168, 168, 88, 88};
-int backward[4] = {200, 56, 200, 56};
-int right[4] = {88, 88, 168, 168};
+int left[4] = {180, 180, 86, 86};
+int backward[4] = {200, 76, 200, 76};
+int right[4] = {86, 86, 180, 180};
 
 int left_rotate[4] = {200, 200, 200, 200};
 int right_rotate[4] = {56, 56, 56, 56};
@@ -72,10 +70,25 @@ void initMotor()
     {
         pinMode(motor_pins[i], OUTPUT);
     }
-    analogWriteFrequency(500000); // 100kHz
+    analogWriteResolution(8);     // 8bitの分解能
+    analogWriteFrequency(169000); // 100kHzのPWM周波数
 }
 void moveForward()
 {
+    // Setpoint = 0;
+    // Input = get_angle_with_heading();
+    // pid_roll.Compute();
+    // for (int i = 0; i < 4; i++)
+    // {
+    //     if (i % 2 == 0)
+    //     {
+    //         analogWrite(motor_pins[i], addSpeed(forward[i], -Output));
+    //     }
+    //     else
+    //     {
+    //         analogWrite(motor_pins[i], addSpeed(forward[i], Output));
+    //     }
+    // }
     for (int i = 0; i < 4; i++)
     {
         analogWrite(motor_pins[i], forward[i]);
@@ -84,6 +97,21 @@ void moveForward()
 
 void moveLeft()
 {
+    // Setpoint = 0;
+    // Input = get_angle_with_heading();
+    // pid_roll.Compute();
+    // for (int i = 0; i < 4; i++)
+    // {
+    //     if (i % 2 == 0)
+    //     {
+    //         analogWrite(motor_pins[i], addSpeed(left[i], -Output));
+    //     }
+    //     else
+    //     {
+    //         analogWrite(motor_pins[i], addSpeed(left[i], Output));
+    //     }
+    // }
+
     for (int i = 0; i < 4; i++)
     {
         analogWrite(motor_pins[i], left[i]);
@@ -91,6 +119,20 @@ void moveLeft()
 }
 void moveBackward()
 {
+    // Setpoint = 0;
+    // Input = get_angle_with_heading();
+    // pid_roll.Compute();
+    // for (int i = 0; i < 4; i++)
+    // {
+    //     if (i % 2 == 0)
+    //     {
+    //         analogWrite(motor_pins[i], addSpeed(backward[i], -Output));
+    //     }
+    //     else
+    //     {
+    //         analogWrite(motor_pins[i], addSpeed(backward[i], Output));
+    //     }
+    // }
     for (int i = 0; i < 4; i++)
     {
         analogWrite(motor_pins[i], backward[i]);
@@ -98,11 +140,26 @@ void moveBackward()
 }
 void moveRight()
 {
+    // Input = get_angle_with_heading();
+    // Setpoint = 0;
+    // pid_roll.Compute();
+    // for (int i = 0; i < 4; i++)
+    // {
+    //     if (i % 2 == 0)
+    //     {
+    //         analogWrite(motor_pins[i], addSpeed(right[i], -Output));
+    //     }
+    //     else
+    //     {
+    //         analogWrite(motor_pins[i], addSpeed(right[i], Output));
+    //     }
+    // }
     for (int i = 0; i < 4; i++)
     {
         analogWrite(motor_pins[i], right[i]);
     }
 }
+
 void rotateLeft(int speed = 0)
 {
     for (int i = 0; i < 4; i++)
@@ -124,34 +181,6 @@ void stop()
     for (int i = 0; i < 4; i++)
     {
         analogWrite(motor_pins[i], 128);
-    }
-}
-void moveLeftForward()
-{
-    for (int i = 0; i < 4; i++)
-    {
-        analogWrite(motor_pins[i], left_forward[i]);
-    }
-}
-void moveLeftBackward()
-{
-    for (int i = 0; i < 4; i++)
-    {
-        analogWrite(motor_pins[i], left_backward[i]);
-    }
-}
-void moveRightForward()
-{
-    for (int i = 0; i < 4; i++)
-    {
-        analogWrite(motor_pins[i], right_forward[i]);
-    }
-}
-void moveRightBackward()
-{
-    for (int i = 0; i < 4; i++)
-    {
-        analogWrite(motor_pins[i], right_backward[i]);
     }
 }
 
@@ -178,18 +207,8 @@ void face_forward(double angle, double target_angle = 0)
     Serial.println("current:" + String(angle) + "°");
     Serial.println("target:" + String(target_angle) + "°");
     Serial.println("calced:" + String(angle + target_angle) + "°");
-    delay(1000);
     Input = angle;
-    Setpoint = angle - target_angle;
-    if (Setpoint > 180)
-    {
-        Setpoint -= 360;
-    }
-    else if (Setpoint < -180)
-    {
-        Setpoint += 360;
-    }
-    Serial.println("calced2:" + String(Setpoint) + "°");
+    Setpoint = 0;
     while (abs(Input - Setpoint) > 5)
     {
         pid_roll.Compute();
@@ -213,15 +232,15 @@ void face_forward(double angle, double target_angle = 0)
     stop();
 }
 
-void test_motor(int index, bool all = false)
+void test_motor(int index)
 {
     if (index != -1)
     {
-
         stop();
         analogWrite(motor_pins[index], 254);
+        delay(500);
     }
-    if (all)
+    else
     {
         moveForward();
         delay(3000);
