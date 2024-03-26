@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <JY901.h>
+#include <pins.h>
 
 #ifndef ROBOCUP_JYRO
 #define ROBOCUP_JYRO
